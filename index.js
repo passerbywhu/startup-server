@@ -5,8 +5,27 @@ const bodyParser = require("koa-bodyparser");
 const fs = require("fs");
 const path = require("path");
 const { init: initDB, Counter } = require("./db");
+const WebSocket = require("ws");
 
 const router = new Router();
+const app = new Koa();
+const server = app.listen(process.env.PORT || 80);
+const wss = new WebSocket.Server({ server, path: '/ws' });
+
+// WebSocket连接处理
+wss.on('connection', function connection(ws) {
+  console.log('新的WebSocket连接已建立');
+
+  ws.on('message', function incoming(message) {
+    console.log('收到消息: %s', message);
+    // 回复消息
+    ws.send(`收到: ${message}`);
+  });
+
+  ws.on('close', () => {
+    console.log('WebSocket连接已关闭');
+  });
+});
 
 const homePage = fs.readFileSync(path.join(__dirname, "index.html"), "utf-8");
 
@@ -50,18 +69,14 @@ router.get("/api/wx_openid", async (ctx) => {
   }
 });
 
-const app = new Koa();
 app
   .use(logger())
   .use(bodyParser())
   .use(router.routes())
   .use(router.allowedMethods());
 
-const port = process.env.PORT || 80;
 async function bootstrap() {
   await initDB();
-  app.listen(port, () => {
-    console.log("启动成功", port);
-  });
+  console.log("启动成功", process.env.PORT || 80);
 }
 bootstrap();
