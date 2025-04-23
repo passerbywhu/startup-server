@@ -69,6 +69,47 @@ router.get("/api/wx_openid", async (ctx) => {
   }
 });
 
+// IM回调处理
+router.post("/imcallback", async (ctx) => {
+  const requestBody = ctx.request.body;
+  
+  // 解析请求字段
+  const {
+    CallbackCommand,    // 回调命令
+    From_Account,       // 消息发送者 UserID
+    To_Account,         // 消息接收者 UserID
+    MsgSeq,            // 消息序列号
+    MsgRandom,         // 消息随机数
+    MsgTime,           // 消息发送时间戳
+    MsgKey,            // 消息唯一标识
+    MsgId,             // 客户端消息唯一标识
+    OnlineOnlyFlag,    // 是否仅在线用户接收标识
+    SendMsgResult,     // 消息发送结果
+    ErrorInfo,         // 错误信息
+    MsgBody,           // 消息体
+    CloudCustomData,   // 自定义数据
+    EventTime          // 事件触发时间戳
+  } = requestBody;
+
+  console.log('收到IM回调请求:', {
+    CallbackCommand,
+    From_Account,
+    To_Account,
+    MsgSeq,
+    MsgTime,
+    MsgKey,
+    SendMsgResult,
+    MsgBody
+  });
+
+  // 返回处理结果
+  ctx.body = {
+    ActionStatus: 'OK',           // 请求处理的结果，OK 表示处理成功，FAIL 表示失败
+    ErrorCode: 0,                 // 错误码，0表示成功
+    ErrorInfo: 'send msg succeed' // 错误信息
+  };
+});
+
 app
   .use(logger())
   .use(bodyParser())
