@@ -99,7 +99,7 @@ router.post("/imcallback", async (ctx) => {
     MsgTime,
     MsgKey,
     SendMsgResult,
-    MsgBody
+    MsgBody: JSON.stringify(MsgBody)
   });
 
   // 返回处理结果
